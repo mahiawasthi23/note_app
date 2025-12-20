@@ -1,63 +1,39 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import User from "@/app/models/User";
+import connectToDB from "@/lib/mongodb";
+import { User } from "@/app/models/User";
 import { hashPassword } from "@/lib/hashPassword";
 
-export async function POST(req) {
+export async function POST(request) {
   try {
-    await connectDB();
+    await connectToDB();
 
-    const { name, email, password } = await req.json();
+    const body = await request.json();
+    const { name, email, password } = body;
 
-    
     if (!name || !email || !password) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json(
-        { message: "Password must be at least 6 characters" },
-        { status: 400 }
-      );
-    }
-
-  
+    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "User already exists" }, { status: 409 });
     }
 
-   
+    // Hash password
     const hashedPassword = await hashPassword(password);
 
-    
-    const user = await User.create({
+    // Create new user
+    const newUser = new User({
       name,
       email,
       password: hashedPassword,
     });
 
-    return NextResponse.json(
-      {
-        message: "User registered successfully",
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-        },
-      },
-      { status: 201 }
-    );
+    await newUser.save();
+
+    return NextResponse.json({ message: "User registered successfully" }, { status: 201 });
   } catch (error) {
-    return NextResponse.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
