@@ -43,7 +43,7 @@ export default function Dashboard() {
   const [editingNote, setEditingNote] = useState(null);
   const [formData, setFormData] = useState({ title: "", content: "" });
 
-  // Authentication & Notes fetching logic (Keeping your functional logic as is)
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -64,7 +64,7 @@ export default function Dashboard() {
     } catch (error) { setNotes([]); }
   };
 
-  // useEffect(() => { fetchNotes(); }, []);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -78,7 +78,7 @@ export default function Dashboard() {
     router.push("/");
   };
 
-  // Search & Pagination Logic
+
   const filteredNotes = useMemo(() => {
     return notes.filter(note =>
       (note.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -124,7 +124,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:to-black p-4 md:p-8 pb-32">
       <div className="max-w-7xl mx-auto space-y-8">
 
-        {/* Modern Navbar Header */}
+     
         <header className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-4 rounded-3xl border border-white/20 shadow-xl shadow-zinc-200/50 dark:shadow-none">
           <div className="flex items-center gap-3 pl-2">
             <div className="bg-black dark:bg-white p-2 rounded-xl shadow-lg">
@@ -175,7 +175,7 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Notes Grid */}
+     
         {filteredNotes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-700">
             {currentNotes.map((note) => (
@@ -221,7 +221,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Simple Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-6 pt-10">
             <Button variant="ghost" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} className="rounded-2xl h-12 w-12">
@@ -237,7 +236,6 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Floating Add Note Button */}
       <Button
         className="fixed bottom-10 right-10 rounded-full h-16 px-8 bg-black text-white hover:bg-zinc-800 shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 group"
         onClick={() => { setEditingNote(null); setFormData({ title: "", content: "" }); setIsModalOpen(true); }}
@@ -246,7 +244,6 @@ export default function Dashboard() {
         <span className="font-bold text-lg">Add Note</span>
       </Button>
 
-      {/* Modern Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[600px] rounded-3xl border-none shadow-2xl p-0 overflow-hidden">
           <div className="bg-zinc-50 p-6 border-b">
