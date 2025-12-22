@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Card,
@@ -15,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -45,7 +47,8 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
-        alert("Login successful! Welcome, " + data.user.name);
+        router.push("/dashboard");
+        // alert("Login successful! Welcome, " + data.user.name);
         // You can redirect or update app state here after login
       }
     } catch (err) {

@@ -192,7 +192,7 @@ export default function SignUpPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label>Full Name</Label>
               <Input
                 id="name"
                 placeholder="John Doe"
