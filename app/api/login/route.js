@@ -6,30 +6,35 @@ import { verifyPassword } from "@/lib/hashPassword";
 export async function POST(request) {
   try {
     await connectToDB();
+    const body = await request.json();
+    const { email, password } = body || {};
 
-    const { email, password } = await request.json();
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { message: "Email and password are required" },
         { status: 400 }
       );
     }
+
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { message: "Invalid email or password" },
         { status: 401 }
       );
     }
+
     const isValid = await verifyPassword(password, user.password);
     if (!isValid) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { message: "Invalid email or password" },
         { status: 401 }
       );
     }
+
     const response = NextResponse.json(
       {
+        success: true,
         message: "Login successful",
         user: {
           name: user.name,
@@ -38,10 +43,13 @@ export async function POST(request) {
       },
       { status: 200 }
     );
+
     response.cookies.set("userId", user._id.toString(), {
       httpOnly: true,
       path: "/",
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return response;

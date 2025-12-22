@@ -46,11 +46,13 @@ export default function Dashboard() {
   const [editingNote, setEditingNote] = useState(null);
   const [formData, setFormData] = useState({ title: "", content: "" });
 
- 
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/me");
+        const res = await fetch("/api/me", {
+          credentials: "include", 
+        });
 
         if (!res.ok) {
           router.push("/login");
@@ -58,8 +60,7 @@ export default function Dashboard() {
         }
 
         const data = await res.json();
-        setUser(data.user ?? data); 
-
+        setUser(data.user ?? data);
       } catch (error) {
         router.push("/login");
       }
@@ -69,15 +70,31 @@ export default function Dashboard() {
   }, [router]);
 
   const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST" });
+    await fetch("/api/logout", {
+      method: "POST",
+      credentials: "include", 
+    });
     router.push("/");
   };
 
-  
+
   const fetchNotes = async () => {
-    const res = await fetch("/api/dashboard");
-    const data = await res.json();
-    setNotes(data);
+    try {
+      const res = await fetch("/api/dashboard", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        setNotes([]);
+        return;
+      }
+
+      const data = await res.json();
+      setNotes(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Fetch notes error:", error);
+      setNotes([]);
+    }
   };
 
   useEffect(() => {
@@ -87,8 +104,12 @@ export default function Dashboard() {
   const filteredNotes = useMemo(() => {
     return notes.filter(
       (note) =>
-        (note.title || "").toLowerCase().includes((searchQuery || "").toLowerCase()) ||
-        (note.content || "").toLowerCase().includes((searchQuery || "").toLowerCase())
+        (note.title || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (note.content || "")
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
     );
   }, [notes, searchQuery]);
 
@@ -102,7 +123,7 @@ export default function Dashboard() {
     currentPage * notesPerPage
   );
 
- 
+
   const handleSave = async () => {
     if (!formData.title || !formData.content) {
       alert("Fill all fields");
@@ -112,6 +133,7 @@ export default function Dashboard() {
     if (editingNote) {
       await fetch("/api/dashboard", {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: editingNote._id,
@@ -122,6 +144,7 @@ export default function Dashboard() {
     } else {
       await fetch("/api/dashboard", {
         method: "POST",
+        credentials: "include", // 🔴
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -137,6 +160,7 @@ export default function Dashboard() {
   const handleDelete = async (id) => {
     await fetch("/api/dashboard", {
       method: "DELETE",
+      credentials: "include", // 🔴
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
@@ -147,7 +171,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 p-6 pb-24">
       <div className="max-w-6xl mx-auto flex flex-col gap-6">
-
+     
         <header className="flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">My Notes</h1>
 
@@ -170,7 +194,7 @@ export default function Dashboard() {
                 <DropdownMenuTrigger asChild>
                   <Avatar className="cursor-pointer">
                     <AvatarFallback>
-                      {(user.name && user.name.charAt(0)) || "U"}
+                      {user.name?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
@@ -178,14 +202,11 @@ export default function Dashboard() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-
                   <div className="px-3 py-2 text-sm">
-                    <p className="font-medium">{user.name || "User"}</p>
-                    <p className="text-xs text-zinc-500">{user.email || "email@example.com"}</p>
+                    <p className="font-medium">{user.name}</p>
+                    <p className="text-xs text-zinc-500">{user.email}</p>
                   </div>
-
                   <DropdownMenuSeparator />
-
                   <DropdownMenuItem
                     className="text-red-600 cursor-pointer"
                     onClick={handleLogout}
@@ -198,12 +219,12 @@ export default function Dashboard() {
           </div>
         </header>
 
+     
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentNotes.map((note) => (
             <Card key={note._id} className="group">
               <CardHeader className="flex flex-row justify-between">
-                <CardTitle>{note.title || "Untitled"}</CardTitle>
-
+                <CardTitle>{note.title}</CardTitle>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100">
                   <Button
                     size="icon"
@@ -211,8 +232,8 @@ export default function Dashboard() {
                     onClick={() => {
                       setEditingNote(note);
                       setFormData({
-                        title: note.title || "",
-                        content: note.content || "",
+                        title: note.title,
+                        content: note.content,
                       });
                       setIsModalOpen(true);
                     }}
@@ -229,16 +250,16 @@ export default function Dashboard() {
                   </Button>
                 </div>
               </CardHeader>
-
               <CardContent>
                 <p className="text-sm text-zinc-600 line-clamp-3">
-                  {note.content || "No content"}
+                  {note.content}
                 </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
+    
         {totalPages > 1 && (
           <div className="flex justify-center gap-4 pt-6">
             <Button
@@ -248,11 +269,9 @@ export default function Dashboard() {
             >
               <ChevronLeft />
             </Button>
-
             <span>
               Page {currentPage} of {totalPages}
             </span>
-
             <Button
               variant="outline"
               disabled={currentPage === totalPages}
@@ -264,6 +283,7 @@ export default function Dashboard() {
         )}
       </div>
 
+
       <Button
         className="fixed bottom-8 right-8 rounded-full h-14 px-6"
         onClick={() => {
@@ -274,6 +294,8 @@ export default function Dashboard() {
       >
         <Plus className="mr-2" /> Add Note
       </Button>
+
+
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
@@ -310,4 +332,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
