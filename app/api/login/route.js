@@ -14,19 +14,19 @@ export async function POST(request) {
             return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
         }
 
-        // Find user by email
+        
         const user = await User.findOne({ email });
         if (!user) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        // Check password
+       
         const isValid = await verifyPassword(password, user.password);
         if (!isValid) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        // You can add session/token logic here
+       
 
         return NextResponse.json({ message: "Login successful", user: { name: user.name, email: user.email } });
     } catch (error) {

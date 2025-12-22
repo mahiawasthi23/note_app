@@ -48,8 +48,6 @@ export default function LoginPage() {
         setError(data.error || "Something went wrong");
       } else {
         router.push("/dashboard");
-        // alert("Login successful! Welcome, " + data.user.name);
-        // You can redirect or update app state here after login
       }
     } catch (err) {
       setError("Failed to connect to server");

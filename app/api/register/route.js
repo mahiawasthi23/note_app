@@ -14,16 +14,16 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Check if user exists
+   
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json({ error: "User already exists" }, { status: 409 });
     }
 
-    // Hash password
+   
     const hashedPassword = await hashPassword(password);
 
-    // Create new user
+    
     const newUser = new User({
       name,
       email,
