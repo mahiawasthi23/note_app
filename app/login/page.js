@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,7 +28,7 @@ export default function LoginPage() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    setError(""); 
+    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -42,13 +43,21 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setError(data.error || "Something went wrong");
-      } else {
-        router.push("/dashboard");
+        const data = await res.json();
+        setError(data.message || "Invalid email or password");
+        setLoading(false);
+        return;
       }
+      const meRes = await fetch("/api/me");
+
+      if (!meRes.ok) {
+        setError("Login failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+      router.replace("/dashboard");
+
     } catch (err) {
       setError("Failed to connect to server");
     } finally {
@@ -65,6 +74,7 @@ export default function LoginPage() {
             Enter your email and password to access your notes
           </CardDescription>
         </CardHeader>
+
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -79,6 +89,7 @@ export default function LoginPage() {
                 disabled={loading}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -90,14 +101,17 @@ export default function LoginPage() {
                 disabled={loading}
               />
             </div>
+
             {error && (
-              <p className="text-red-600 text-sm text-center mt-1">{error}</p>
+              <p className="text-red-600 text-sm text-center">{error}</p>
             )}
           </CardContent>
+
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
+
             <div className="text-sm text-center text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
