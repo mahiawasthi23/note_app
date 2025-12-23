@@ -20,12 +20,12 @@ export default function Home() {
       <div className="absolute bottom-0 -right-4 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-700"></div>
 
       <main className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-zinc-200 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        {/* <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-md border border-zinc-200 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <Sparkles className="h-4 w-4 text-purple-600" />
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
             Cloud Powered Notes
           </span>
-        </div>
+        </div> */}
 
         <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-zinc-900 dark:text-white mb-6">
           Smart<span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600">Notes</span>
